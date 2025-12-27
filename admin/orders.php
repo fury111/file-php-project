@@ -3,26 +3,21 @@
 
 include 'admin_header.php';
 
-// Include the AdminOrder class
-require_once 'AdminOrder.php'; // Adjust path if necessary
+require_once 'AdminOrder.php';
 
-// Create an instance of the AdminOrder class
 $adminOrder = new AdminOrder();
 
-// Fetch all orders from the database
-$orders = $adminOrder->getAllOrders(); // This method needs to be implemented in AdminOrder.php
+$orders = $adminOrder->getAllOrders(); 
 
 ?>
 
 <div class="container-fluid mt-4">
     <div class="row">
-        <!-- Main Content -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                 <h1 class="h2">Manage Orders</h1>
             </div>
 
-            <!-- Order Search & Filter (Optional) -->
             <div class="row mb-3">
                 <div class="col-md-4">
                     <input type="text" class="form-control" placeholder="Search orders...">
@@ -35,13 +30,12 @@ $orders = $adminOrder->getAllOrders(); // This method needs to be implemented in
                         <option>Shipped</option>
                         <option>Delivered</option>
                         <option>Cancelled</option>
-                        <option>Rejected</option> <!-- Added Rejected option -->
+                        <option>Rejected</option> 
                     </select>
                 </div>
                 <div class="col-md-3">
                     <select class="form-select">
                         <option>All Users</option>
-                        <!-- Users will be populated dynamically later if needed -->
                     </select>
                 </div>
                 <div class="col-md-2">
@@ -49,7 +43,6 @@ $orders = $adminOrder->getAllOrders(); // This method needs to be implemented in
                 </div>
             </div>
 
-            <!-- Orders Table -->
             <div class="table-responsive">
                 <table class="table table-striped table-sm">
                     <thead>
@@ -71,7 +64,7 @@ $orders = $adminOrder->getAllOrders(); // This method needs to be implemented in
                             <?php foreach ($orders as $order): ?>
                                 <tr>
                                     <td>#<?= htmlspecialchars($order['order_id']) ?></td>
-                                    <td><?= htmlspecialchars($order['user_name'] ?? 'N/A') ?></td> <!-- Assuming joined user name -->
+                                    <td><?= htmlspecialchars($order['user_name'] ?? 'N/A') ?></td>
                                     <td>$<?= number_format(htmlspecialchars($order['total_price']), 2) ?></td>
                                     <td>
                                         <span class="badge 
@@ -90,7 +83,7 @@ $orders = $adminOrder->getAllOrders(); // This method needs to be implemented in
                                                     echo 'bg-success';
                                                     break;
                                                 case 'cancelled':
-                                                case 'rejected': // Treat rejected like cancelled (red)
+                                                case 'rejected':
                                                     echo 'bg-danger';
                                                     break;
                                                 default:
@@ -103,7 +96,6 @@ $orders = $adminOrder->getAllOrders(); // This method needs to be implemented in
                                     <td><?= htmlspecialchars($order['created_at']) ?></td>
                                     <td>
                                       <?php if ($order['status'] === 'pending'): ?>
-    <!-- Example: Approve sets status to 'delivered' -->
     <a href="update_order_status.php?id=<?= $order['order_id'] ?>&status=delivered" class="btn btn-sm btn-outline-success">Approve</a>
     <a href="update_order_status.php?id=<?= $order['order_id'] ?>&status=cancelled" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to cancel this order?')">Deny</a>
 <?php endif; ?>

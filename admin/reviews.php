@@ -3,26 +3,21 @@
 
 include 'admin_header.php';
 
-// Include the AdminReview class
-require_once 'AdminReview.php'; // Adjust path if necessary
+require_once 'AdminReview.php'; 
 
-// Create an instance of the AdminReview class
 $adminReview = new AdminReview();
 
-// Fetch all reviews from the database
-$reviews = $adminReview->getAllReviews(); // This method needs to be implemented in AdminReview.php
+$reviews = $adminReview->getAllReviews(); 
 
 ?>
 
 <div class="container-fluid mt-4">
     <div class="row">
-        <!-- Main Content -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                 <h1 class="h2">Manage Reviews</h1>
             </div>
 
-            <!-- Reviews Table -->
             <div class="table-responsive">
                 <table class="table table-striped table-sm">
                     <thead>
@@ -49,13 +44,12 @@ $reviews = $adminReview->getAllReviews(); // This method needs to be implemented
                                     <td>
                                         <span class="text-warning">
                                             <?php
-                                            // Generate star rating display
                                             $rating = (int)$review['rating'];
                                             for ($i = 1; $i <= 5; $i++) {
                                                 if ($i <= $rating) {
-                                                    echo '★'; // Filled star
+                                                    echo '★';
                                                 } else {
-                                                    echo '☆'; // Empty star
+                                                    echo '☆'; 
                                                 }
                                             }
                                             ?>

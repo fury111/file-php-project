@@ -3,35 +3,28 @@
 
 include 'admin_header.php';
 
-// Include the AdminUser class
-require_once 'AdminUser.php'; // Adjust path if necessary
+require_once 'AdminUser.php'; 
 
-// Create an instance of the AdminUser class
 $adminUser = new AdminUser();
 
-// Fetch all users from the database
-$users = $adminUser->getAllUsers(); // This method needs to be implemented in AdminUser.php
+$users = $adminUser->getAllUsers(); 
 
 ?>
 
 <div class="container-fluid mt-4">
     <div class="row">
 
-        <!-- Main Content -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                 <h1 class="h2">Manage Users</h1>
-                <!-- No "Add New User" button typically for end users -->
             </div>
 
-            <!-- User Search -->
             <div class="row mb-3">
                 <div class="col-md-6">
                     <input type="text" class="form-control" placeholder="Search users...">
                 </div>
             </div>
 
-            <!-- Users Table -->
             <div class="table-responsive">
                 <table class="table table-striped table-sm">
                     <thead>
@@ -60,7 +53,7 @@ $users = $adminUser->getAllUsers(); // This method needs to be implemented in Ad
                                             <?php 
                                             if ($user['role'] === 'admin') echo 'bg-danger'; 
                                             elseif ($user['role'] === 'user') echo 'bg-success'; 
-                                            else echo 'bg-secondary'; // For other roles if any
+                                            else echo 'bg-secondary'; 
                                             ?>">
                                             <?= htmlspecialchars($user['role']) ?>
                                         </span>
