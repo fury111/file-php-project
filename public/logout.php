@@ -1,1 +1,10 @@
-sends you back to either the log in page or the landing page
+<?php
+session_start();
+
+require_once '../includes/auth.php';
+
+logout();
+
+header('Location: login.php');
+
+exit;

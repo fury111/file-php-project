@@ -1,5 +1,5 @@
 <?php
-session_start();
+
 $isLoggedIn = isset($_SESSION['user_id']);
 $isAdmin = ($isLoggedIn && $_SESSION['role'] === 'admin');
 ?>
@@ -54,7 +54,7 @@ $isAdmin = ($isLoggedIn && $_SESSION['role'] === 'admin');
                 <li class="nav-item dropdown me-3">
                     <?php if ($isLoggedIn): ?>
                         <a class="nav-link dropdown-toggle text-white" href="#" id="accountDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Hello, <?= htmlspecialchars($_SESSION['name']) ?><br><small>Account & Lists</small>
+                            Hello, <?= htmlspecialchars($_SESSION['first_name']) ?><br><small>Account & Lists</small>
                         </a>
                     <?php else: ?>
                         <a class="nav-link text-white" href="../public/login.php">
