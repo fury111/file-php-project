@@ -26,7 +26,6 @@ class Database {
         return self::$instance;
     }
 
-    // Public method to access the PDO connection
     public function getConnection() {
         return $this->pdo;
     }

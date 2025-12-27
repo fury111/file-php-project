@@ -41,7 +41,7 @@ $users = $adminUser->getAllUsers(); // This method needs to be implemented in Ad
                             <th>Email</th>
                             <th>Role</th>
                             <th>Registration Date</th>
-                            <th>Actions</th>
+                       
                         </tr>
                     </thead>
                     <tbody>
@@ -66,10 +66,7 @@ $users = $adminUser->getAllUsers(); // This method needs to be implemented in Ad
                                         </span>
                                     </td>
                                     <td><?= htmlspecialchars($user['created_at']) ?></td>
-                                    <td>
-                                        <a href="edit_user.php?id=<?= $user['user_id'] ?>" class="btn btn-sm btn-outline-primary">Edit</a>
-                                        <a href="delete_user.php?id=<?= $user['user_id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this user?')">Delete</a>
-                                    </td>
+        
                                 </tr>
                             <?php endforeach; ?>
                         <?php endif; ?>

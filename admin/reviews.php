@@ -33,8 +33,6 @@ $reviews = $adminReview->getAllReviews(); // This method needs to be implemented
                             <th>Rating</th>
                             <th>Comment</th>
                             <th>Date</th>
-                            <!-- Removed Status column -->
-                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -65,11 +63,7 @@ $reviews = $adminReview->getAllReviews(); // This method needs to be implemented
                                     </td>
                                     <td><?= htmlspecialchars($review['comment']) ?></td>
                                     <td><?= htmlspecialchars($review['created_at']) ?></td>
-                                    <td>
-                                        <a href="edit_review.php?id=<?= $review['review_id'] ?>" class="btn btn-sm btn-outline-primary">Edit</a>
-                                        <!-- Example action links (you'd need corresponding PHP scripts) -->
-                                        <a href="delete_review.php?id=<?= $review['review_id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this review?')">Delete</a>
-                                    </td>
+                              
                                 </tr>
                             <?php endforeach; ?>
                         <?php endif; ?>

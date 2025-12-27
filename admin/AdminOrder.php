@@ -30,14 +30,12 @@ class AdminOrder {
 
 
     public function updateOrderStatus($orderId, $newStatus) {
-
+        // Changed table name from 'ee_commerce_orders' to 'orders'
         $sql = "UPDATE orders SET status = ? WHERE order_id = ?";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$newStatus, $orderId]);
-        return $stmt->rowCount() > 0; 
-    }
-
+        return $stmt->rowCount() > 0; // Returns true if update was successful
 
 }
-
+}
 ?>

@@ -65,6 +65,7 @@ $categories = $adminCategory->getAllCategories();
                                     <td><?= htmlspecialchars($product['product_id']) ?></td>
                                     <td><?= htmlspecialchars($product['product_name']) ?></td>
                                     <td><?= htmlspecialchars($product['category_name'] ?? 'N/A') ?></td> 
+                                    <td><?= htmlspecialchars($product['price']) ?></td>
                                     <td><?= htmlspecialchars($product['stock']) ?></td>
                                     <td>
                                         <?php if (!empty($product['image'])): ?>
