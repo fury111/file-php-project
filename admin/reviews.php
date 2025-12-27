@@ -1,48 +1,21 @@
 <?php
 
-include '../includes/header.php';
+
+include 'admin_header.php';
+
+// Include the AdminReview class
+require_once 'AdminReview.php'; // Adjust path if necessary
+
+// Create an instance of the AdminReview class
+$adminReview = new AdminReview();
+
+// Fetch all reviews from the database
+$reviews = $adminReview->getAllReviews(); // This method needs to be implemented in AdminReview.php
+
 ?>
 
 <div class="container-fluid mt-4">
     <div class="row">
-        <!-- Sidebar -->
-        <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
-            <div class="position-sticky pt-3">
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link" href="dashboard.php">
-                            <i class="fas fa-tachometer-alt"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="products.php">
-                            <i class="fas fa-box"></i> Products
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="categories.php">
-                            <i class="fas fa-tags"></i> Categories
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="users.php">
-                            <i class="fas fa-users"></i> Users
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="orders.php">
-                            <i class="fas fa-shopping-cart"></i> Orders
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="reviews.php">
-                            <i class="fas fa-comments"></i> Reviews
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
-
         <!-- Main Content -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -60,50 +33,46 @@ include '../includes/header.php';
                             <th>Rating</th>
                             <th>Comment</th>
                             <th>Date</th>
-                            <th>Status</th>
+                            <!-- Removed Status column -->
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>501</td>
-                            <td>Wireless Headphones</td>
-                            <td>John Doe</td>
-                            <td><span class="text-warning">★★★★☆</span> (4)</td>
-                            <td>Great sound quality!</td>
-                            <td>2025-12-23</td>
-                            <td><span class="badge bg-success">Approved</span></td>
-                            <td>
-                                <a href="edit_review.php?id=501" class="btn btn-sm btn-outline-primary">Edit</a>
-                                <a href="delete_review.php?id=501" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure?')">Delete</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>502</td>
-                            <td>Smart Watch</td>
-                            <td>Jane Smith</td>
-                            <td><span class="text-warning">★★★★★</span> (5)</td>
-                            <td>Perfect for tracking workouts.</td>
-                            <td>2025-12-22</td>
-                            <td><span class="badge bg-success">Approved</span></td>
-                            <td>
-                                <a href="edit_review.php?id=502" class="btn btn-sm btn-outline-primary">Edit</a>
-                                <a href="delete_review.php?id=502" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure?')">Delete</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>503</td>
-                            <td>USB-C Charging Cable</td>
-                            <td>Bob Johnson</td>
-                            <td><span class="text-warning">★★☆☆☆</span> (2)</td>
-                            <td>Stopped working after a week.</td>
-                            <td>2025-12-20</td>
-                            <td><span class="badge bg-warning">Pending</span></td>
-                            <td>
-                                <a href="approve_review.php?id=503" class="btn btn-sm btn-outline-success">Approve</a>
-                                <a href="delete_review.php?id=503" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure?')">Reject</a>
-                            </td>
-                        </tr>
+                        <?php if (empty($reviews)): ?>
+                            <tr>
+                                <td colspan="7" class="text-center">No reviews found.</td>
+                            </tr>
+                        <?php else: ?>
+                            <?php foreach ($reviews as $review): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($review['review_id']) ?></td>
+                                    <td><?= htmlspecialchars($review['product_name']) ?></td>
+                                    <td><?= htmlspecialchars($review['user_name']) ?></td>
+                                    <td>
+                                        <span class="text-warning">
+                                            <?php
+                                            // Generate star rating display
+                                            $rating = (int)$review['rating'];
+                                            for ($i = 1; $i <= 5; $i++) {
+                                                if ($i <= $rating) {
+                                                    echo '★'; // Filled star
+                                                } else {
+                                                    echo '☆'; // Empty star
+                                                }
+                                            }
+                                            ?>
+                                        </span> (<?= $rating ?>)
+                                    </td>
+                                    <td><?= htmlspecialchars($review['comment']) ?></td>
+                                    <td><?= htmlspecialchars($review['created_at']) ?></td>
+                                    <td>
+                                        <a href="edit_review.php?id=<?= $review['review_id'] ?>" class="btn btn-sm btn-outline-primary">Edit</a>
+                                        <!-- Example action links (you'd need corresponding PHP scripts) -->
+                                        <a href="delete_review.php?id=<?= $review['review_id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this review?')">Delete</a>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
@@ -112,4 +81,4 @@ include '../includes/header.php';
     </div>
 </div>
 
-<?php include '../includes/footer.php'; ?>
+<?php include 'admin_footer.php'; ?>

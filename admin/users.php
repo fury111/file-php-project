@@ -1,47 +1,21 @@
 <?php
 
-include '../includes/header.php';
+
+include 'admin_header.php';
+
+// Include the AdminUser class
+require_once 'AdminUser.php'; // Adjust path if necessary
+
+// Create an instance of the AdminUser class
+$adminUser = new AdminUser();
+
+// Fetch all users from the database
+$users = $adminUser->getAllUsers(); // This method needs to be implemented in AdminUser.php
+
 ?>
 
 <div class="container-fluid mt-4">
     <div class="row">
-        <!-- Sidebar -->
-        <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
-            <div class="position-sticky pt-3">
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link" href="dashboard.php">
-                            <i class="fas fa-tachometer-alt"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="products.php">
-                            <i class="fas fa-box"></i> Products
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="categories.php">
-                            <i class="fas fa-tags"></i> Categories
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="users.php">
-                            <i class="fas fa-users"></i> Users
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="orders.php">
-                            <i class="fas fa-shopping-cart"></i> Orders
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="reviews.php">
-                            <i class="fas fa-comments"></i> Reviews
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
 
         <!-- Main Content -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
@@ -71,39 +45,34 @@ include '../includes/header.php';
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>John Doe</td>
-                            <td>john.doe@example.com</td>
-                            <td>User</td>
-                            <td>2024-10-01</td>
-                            <td>
-                                <a href="edit_user.php?id=1" class="btn btn-sm btn-outline-primary">Edit</a>
-                                <a href="delete_user.php?id=1" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure?')">Delete</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>Jane Smith</td>
-                            <td>jane.smith@example.com</td>
-                            <td>Admin</td>
-                            <td>2024-08-15</td>
-                            <td>
-                                <a href="edit_user.php?id=2" class="btn btn-sm btn-outline-primary">Edit</a>
-                                <a href="delete_user.php?id=2" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure?')">Delete</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>3</td>
-                            <td>Bob Johnson</td>
-                            <td>bob.j@example.com</td>
-                            <td>User</td>
-                            <td>2024-11-20</td>
-                            <td>
-                                <a href="edit_user.php?id=3" class="btn btn-sm btn-outline-primary">Edit</a>
-                                <a href="delete_user.php?id=3" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure?')">Delete</a>
-                            </td>
-                        </tr>
+                        <?php if (empty($users)): ?>
+                            <tr>
+                                <td colspan="6" class="text-center">No users found.</td>
+                            </tr>
+                        <?php else: ?>
+                            <?php foreach ($users as $user): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($user['user_id']) ?></td>
+                                    <td><?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?></td>
+                                    <td><?= htmlspecialchars($user['email']) ?></td>
+                                    <td>
+                                        <span class="badge 
+                                            <?php 
+                                            if ($user['role'] === 'admin') echo 'bg-danger'; 
+                                            elseif ($user['role'] === 'user') echo 'bg-success'; 
+                                            else echo 'bg-secondary'; // For other roles if any
+                                            ?>">
+                                            <?= htmlspecialchars($user['role']) ?>
+                                        </span>
+                                    </td>
+                                    <td><?= htmlspecialchars($user['created_at']) ?></td>
+                                    <td>
+                                        <a href="edit_user.php?id=<?= $user['user_id'] ?>" class="btn btn-sm btn-outline-primary">Edit</a>
+                                        <a href="delete_user.php?id=<?= $user['user_id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this user?')">Delete</a>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
@@ -112,4 +81,4 @@ include '../includes/header.php';
     </div>
 </div>
 
-<?php include '../includes/footer.php'; ?>
+<?php include 'admin_footer.php'; ?>

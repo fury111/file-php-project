@@ -1,56 +1,29 @@
 <?php
 
-include '../includes/header.php';
+
+include 'admin_header.php';
+require_once 'AdminProduct.php'; 
+require_once 'AdminCategory.php'; 
+
+
+$adminProduct = new AdminProduct();
+$adminCategory = new AdminCategory(); 
+
+$products = $adminProduct->getAllProducts(); 
+$categories = $adminCategory->getAllCategories(); 
+
 ?>
 
 <div class="container-fluid mt-4">
     <div class="row">
-        <!-- Sidebar -->
-        <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
-            <div class="position-sticky pt-3">
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link" href="dashboard.php">
-                            <i class="fas fa-tachometer-alt"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="products.php">
-                            <i class="fas fa-box"></i> Products
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="categories.php">
-                            <i class="fas fa-tags"></i> Categories
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="users.php">
-                            <i class="fas fa-users"></i> Users
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="orders.php">
-                            <i class="fas fa-shopping-cart"></i> Orders
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="reviews.php">
-                            <i class="fas fa-comments"></i> Reviews
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
 
-        <!-- Main Content -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                 <h1 class="h2">Manage Products</h1>
-                <a href="add_product.php" class="btn btn-primary">Add New Product</a> <!-- Link to add page -->
+                <a href="add_product.php" class="btn btn-primary">Add New Product</a> 
             </div>
 
-            <!-- Product Search & Filter (Optional) -->
+       
             <div class="row mb-3">
                 <div class="col-md-6">
                     <input type="text" class="form-control" placeholder="Search products...">
@@ -58,9 +31,9 @@ include '../includes/header.php';
                 <div class="col-md-3">
                     <select class="form-select">
                         <option>All Categories</option>
-                        <option>Electronics</option>
-                        <option>Fashion</option>
-                        <option>Home</option>
+                        <?php foreach ($categories as $category): ?>
+                            <option value="<?= $category['category_id'] ?>"><?= htmlspecialchars($category['category_name']) ?></option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
                 <div class="col-md-3">
@@ -68,7 +41,6 @@ include '../includes/header.php';
                 </div>
             </div>
 
-            <!-- Products Table -->
             <div class="table-responsive">
                 <table class="table table-striped table-sm">
                     <thead>
@@ -83,47 +55,36 @@ include '../includes/header.php';
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>101</td>
-                            <td>Wireless Headphones</td>
-                            <td>Electronics</td>
-                            <td>$79.99</td>
-                            <td>50</td>
-                            <td><img src="../assets/images/product1.jpg" alt="Product" width="50" height="50"></td>
-                            <td>
-                                <a href="edit_product.php?id=101" class="btn btn-sm btn-outline-primary">Edit</a>
-                                <a href="delete_product.php?id=101" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure?')">Delete</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>102</td>
-                            <td>Smart Watch</td>
-                            <td>Electronics</td>
-                            <td>$129.99</td>
-                            <td>25</td>
-                            <td><img src="../assets/images/product2.jpg" alt="Product" width="50" height="50"></td>
-                            <td>
-                                <a href="edit_product.php?id=102" class="btn btn-sm btn-outline-primary">Edit</a>
-                                <a href="delete_product.php?id=102" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure?')">Delete</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>103</td>
-                            <td>USB-C Charging Cable</td>
-                            <td>Accessories</td>
-                            <td>$12.50</td>
-                            <td>100</td>
-                            <td><img src="../assets/images/product3.jpg" alt="Product" width="50" height="50"></td>
-                            <td>
-                                <a href="edit_product.php?id=103" class="btn btn-sm btn-outline-primary">Edit</a>
-                                <a href="delete_product.php?id=103" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure?')">Delete</a>
-                            </td>
-                        </tr>
+                        <?php if (empty($products)): ?>
+                            <tr>
+                                <td colspan="7" class="text-center">No products found.</td>
+                            </tr>
+                        <?php else: ?>
+                            <?php foreach ($products as $product): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($product['product_id']) ?></td>
+                                    <td><?= htmlspecialchars($product['product_name']) ?></td>
+                                    <td><?= htmlspecialchars($product['category_name'] ?? 'N/A') ?></td> 
+                                    <td><?= htmlspecialchars($product['stock']) ?></td>
+                                    <td>
+                                        <?php if (!empty($product['image'])): ?>
+                                            <img src="../assets/images/<?= htmlspecialchars($product['image']) ?>" alt="Product Image" width="50" height="50">
+                                        <?php else: ?>
+                                            <span class="text-muted">No Image</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <a href="edit_product.php?id=<?= $product['product_id'] ?>" class="btn btn-sm btn-outline-primary">Edit</a>
+                                        <a href="delete_product.php?id=<?= $product['product_id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this product?')">Delete</a>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
 
-            <!-- Pagination (Optional Placeholder) -->
+
             <nav aria-label="Product pagination">
                 <ul class="pagination justify-content-center">
                     <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
@@ -138,4 +99,4 @@ include '../includes/header.php';
     </div>
 </div>
 
-<?php include '../includes/footer.php'; ?>
+<?php include 'admin_footer.php'; ?>

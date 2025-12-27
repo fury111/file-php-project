@@ -1,0 +1,53 @@
+This is a relational MySQL schema for an e-commerce system with the following tables:
+
+Users
+Products & Categories
+Shopping Cart
+Orders & Order Items
+Payments
+Reviews
+
+ee_commerce_users:
+user_id (PK), first_name, last_name, email, password, location, role, created_at
+
+These are the information needed to be taken from the registration page in order to create a user in the main page. The first_name and last_name will be joined to create the full name aspect and the email will be the login credential to log into the account. The password needs to be hashed using PHP's password_hash() function before storing. The location can be used for shipping address defaults or targeted promotions. The role column (e.g., 'admin', 'user') determines access rights and functionality (e.g., showing the "Admin Dashboard" link). The created_at timestamp records when the account was registered, useful for account history or promotions.
+
+ee_commerce_categories:
+category_id (PK), category_name, description, created_at
+
+The category_id is the primary key used to uniquely identify each category. The category_name and description will be displayed when the category is clicked on to view its details or used in dropdowns/filters. The created_at timestamp records when the category was added, potentially useful for sorting or historical tracking. This table is essential for organizing products and allowing users to browse by category on the homepage and product listing pages.
+
+ee_commerce_products:
+product_id (PK), product_name, description, price, stock, image, created_at, updated_at, category_id (FK)
+
+The products are the items that will be displayed within the category itself with all the aspects needed for them ranging from the price, the stock, the image, and the description. So when an item is viewed within a category, all these information will be displayed on the product listing and product details pages. The product_id uniquely identifies each product. The stock quantity is crucial for preventing overselling and displaying availability. The image stores the filename, used in <img src="..."> tags. The updated_at timestamp helps track when product details were last modified. The category_id links the product to its specific category in the categories table, enabling category-based filtering and navigation.
+
+ee_commerce_cart:
+cart_id (PK), user_id (FK)
+
+The cart will be linked to the user_id in order for the items to be linked to their login session. The cart_id serves as a unique identifier for a specific user's current shopping cart session. This table acts as a container, linking a user to their collection of items stored in the cart_items table. It ensures that each logged-in user sees only their own cart contents.
+
+ee_commerce_cart_items:
+cart_item_id (PK), quantity, price, product_id (FK), cart_id (FK)
+
+This table stores the individual items added to a user's shopping cart. The quantity column tracks how many units of a specific product the user wants to purchase. The price column stores the product's price at the time it was added to the cart, ensuring the price is locked in even if the product's price changes later in the main products table. The product_id links this item to its specific details (name, image, etc.) in the products table, allowing the cart page to display product information. The cart_id links this item to the specific user's cart session in the cart table, ensuring items are separated per user.
+
+ee_commerce_orders:
+order_id (PK), created_at, total_price, user_id (FK), status
+
+This table represents a single order placed by a user. The order_id serves as a unique identifier for the order, often displayed to the user (e.g., "#1001") on order confirmation or history pages. The created_at timestamp records when the order was placed. The total_price is the calculated sum of all items in the order at the time of purchase, used for display and financial records. The user_id links this order to the specific user who placed it, allowing them to view their order history in their profile. The status column (e.g., 'pending', 'approved', 'shipped', 'delivered', 'cancelled') tracks the progress of the order and can be updated by the admin or the system, fulfilling the bonus feature for order status flow and enabling notifications.
+
+ee_commerce_order_items:
+order_item_id (PK), quantity, price, order_id (FK), product_id (FK)
+
+This table stores the individual items that were part of a specific order. The quantity and price columns capture the number of units and the price per unit at the time the order was placed, preserving this information for historical records (e.g., invoices, order details page) even if the product's details change later. The order_id links this item to the overall order record in the orders table. The product_id links back to the specific product details in the products table, allowing the system to display what was ordered on the order confirmation page or in the admin panel.
+
+ee_commerce_payments:
+payment_id (PK), order_id (FK), amount, payment_method, payment_status, payment_date
+
+This table records the payment details for each order. The order_id links the payment to the specific order it was for, ensuring financial records match order records. The amount should match the total_price from the orders table, confirming the correct payment amount. The payment_method (e.g., 'credit_card', 'debit_card', 'paypal') stores how the user chose to pay, useful for analytics or specific payment processing logic. The payment_status (e.g., 'pending', 'completed', 'failed', 'refunded') indicates the current state of the payment transaction, crucial for order fulfillment (e.g., only ship if payment is completed). The payment_date records when the payment was processed, important for financial reporting and audits.
+
+ee_commerce_reviews:
+review_id (PK), rating, comment, created_at, product_id (FK), user_id (FK)
+
+This table stores user reviews and ratings for products. The rating column holds a numerical value (e.g., 1-5 stars) representing the user's satisfaction, which can be displayed visually (e.g., star icons) on product pages. The comment column contains the user's written feedback, displayed alongside the rating. The created_at timestamp records when the review was submitted, allowing reviews to be sorted chronologically. The product_id links the review to the specific product it's about, allowing reviews to be fetched and displayed on the product details page. The user_id links the review to the specific user who wrote it, ensuring accountability, allowing the system to show who reviewed what, and enabling the admin to manage reviews effectively. This table supports the core feature of product comments and ratings, as well as the admin's ability to manage reviews.

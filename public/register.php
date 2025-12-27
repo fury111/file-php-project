@@ -18,6 +18,10 @@ unset($_SESSION['error_message']);
 // Optional: Get success message
 $success_message = isset($_SESSION['success_message']) ? $_SESSION['success_message'] : '';
 unset($_SESSION['success_message']);
+
+// Optional: Get form data to repopulate fields on error
+$form_data = isset($_SESSION['form_data']) ? $_SESSION['form_data'] : [];
+unset($_SESSION['form_data']);
 ?>
 
 <div class="container mt-5">
@@ -43,14 +47,24 @@ unset($_SESSION['success_message']);
                         </div>
                     <?php endif; ?>
 
-                    <form action="process_register.php" method="POST"> <!-- Replace with your actual registration processing script -->
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Full Name</label>
-                            <input type="text" class="form-control" id="name" name="name" required>
+                    <form action="process_register.php" method="POST"> <!-- Points to the updated processing script -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="first_name" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="first_name" name="first_name" value="<?= htmlspecialchars($form_data['first_name'] ?? '') ?>" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="last_name" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="last_name" name="last_name" value="<?= htmlspecialchars($form_data['last_name'] ?? '') ?>" required>
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="email" class="form-label">Email Address</label>
-                            <input type="email" class="form-control" id="email" name="email" required>
+                            <input type="email" class="form-control" id="email" name="email" value="<?= htmlspecialchars($form_data['email'] ?? '') ?>" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="location" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="location" name="location" value="<?= htmlspecialchars($form_data['location'] ?? '') ?>">
                         </div>
                         <div class="mb-3">
                             <label for="password" class="form-label">Password</label>
