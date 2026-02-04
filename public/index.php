@@ -1,4 +1,24 @@
-<?php include '../includes/header.php'; ?>
+<?php
+require_once '../Classes/product.php';
+require_once '../Classes/category.php';
+include '../includes/header.php';
+
+$productObj = new Product();
+$categoryObj = new Category();
+
+$search = $_GET['search'] ?? '';
+$categoryFilter = $_GET['category'] ?? 'all';
+
+if ($categoryFilter !== 'all') {
+  $products = $productObj->getByCategory($categoryFilter);
+} elseif (!empty($search)) {
+  $products = $productObj->search($search);
+} else {
+  $products = $productObj->getAllFeatured(9);
+}
+
+$allCategories = $categoryObj->getAll();
+?>
 
 <!-- Hero Section -->
 <section class="bg-primary text-white py-5">
@@ -7,10 +27,11 @@
       <div class="col-lg-6">
         <h1 class="display-4 fw-bold">Shop the Latest Trends</h1>
         <p class="lead">Discover amazing products at unbeatable prices. Free shipping on orders over $50!</p>
-        <a href="index.php" class="btn btn-light btn-lg">Shop Now</a>
+        <a href="#featured" class="btn btn-light btn-lg">Shop Now</a>
       </div>
       <div class="col-lg-6 text-center">
-        <img src="assets/images/hero_banner.png" alt="Hero Banner" class="img-fluid rounded shadow">
+        <img src="../Assets/images/hero_banner.png" alt="Hero Banner" class="img-fluid rounded shadow"
+          onerror="this.src='https://via.placeholder.com/600x400?text=Shop+Now'">
       </div>
     </div>
   </div>
@@ -24,54 +45,50 @@
 </section>
 
 <!-- Featured Products -->
-<section class="py-5 bg-light">
+<section id="featured" class="py-5 bg-light">
   <div class="container">
-    <h2 class="text-center mb-4">Featured Products</h2>
+    <h2 class="text-center mb-4">
+      <?php if (!empty($search)): ?>
+        Search Results for "<?= htmlspecialchars($search) ?>"
+      <?php elseif ($categoryFilter !== 'all'): ?>
+        Products in Category
+      <?php else: ?>
+        Featured Products
+      <?php endif; ?>
+    </h2>
     <div class="row">
-      <!-- Product 1 -->
-      <div class="col-md-4 mb-4">
-        <div class="card h-100 shadow-sm">
-          <img src="assets/images/product1.jpg" class="card-img-top" alt="Product 1" style="height: 200px; object-fit: cover;">
-          <div class="card-body d-flex flex-column">
-            <h5 class="card-title">Wireless Headphones</h5>
-            <p class="text-muted">Noise-cancelling, 30h battery</p>
-            <div class="mt-auto">
-              <p class="card-text text-success fs-5 fw-bold">$79.99</p>
-              <a href="product_details.php?id=1" class="btn btn-primary w-100">View Details</a>
+      <?php if (empty($products)): ?>
+        <div class="col-12 text-center">
+          <p class="lead">No products found.</p>
+          <a href="index.php" class="btn btn-primary">View All Products</a>
+        </div>
+      <?php else: ?>
+        <?php foreach ($products as $product): ?>
+          <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+              <img src="../Assets/images/<?= htmlspecialchars($product['image'] ?? 'placeholder.jpg') ?>"
+                class="card-img-top" alt="<?= htmlspecialchars($product['product_name']) ?>"
+                style="height: 250px; object-fit: cover;"
+                onerror="this.src='https://via.placeholder.com/400x300?text=<?= urlencode($product['product_name']) ?>'">
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title"><?= htmlspecialchars($product['product_name']) ?></h5>
+                <p class="text-muted text-truncate"><?= htmlspecialchars($product['description']) ?></p>
+                <div class="mt-auto">
+                  <p class="card-text text-success fs-5 fw-bold">$<?= number_format($product['price'], 2) ?></p>
+                  <div class="d-flex gap-2">
+                    <a href="product_details.php?id=<?= $product['product_id'] ?>"
+                      class="btn btn-outline-primary flex-grow-1">Details</a>
+                    <form action="add_to_cart.php" method="POST" class="flex-grow-1">
+                      <input type="hidden" name="product_id" value="<?= $product['product_id'] ?>">
+                      <button type="submit" class="btn btn-primary w-100">Add to Cart</button>
+                    </form>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-
-      <!-- Product 2 -->
-      <div class="col-md-4 mb-4">
-        <div class="card h-100 shadow-sm">
-          <img src="assets/images/product2.jpg" class="card-img-top" alt="Product 2" style="height: 200px; object-fit: cover;">
-          <div class="card-body d-flex flex-column">
-            <h5 class="card-title">Smart Watch</h5>
-            <p class="text-muted">Fitness tracker, heart rate monitor</p>
-            <div class="mt-auto">
-              <p class="card-text text-success fs-5 fw-bold">$129.99</p>
-              <a href="product_details.php?id=2" class="btn btn-primary w-100">View Details</a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Product 3 -->
-      <div class="col-md-4 mb-4">
-        <div class="card h-100 shadow-sm">
-          <img src="assets/images/product3.jpg" class="card-img-top" alt="Product 3" style="height: 200px; object-fit: cover;">
-          <div class="card-body d-flex flex-column">
-            <h5 class="card-title">Bluetooth Speaker</h5>
-            <p class="text-muted">360° sound, waterproof</p>
-            <div class="mt-auto">
-              <p class="card-text text-success fs-5 fw-bold">$59.99</p>
-              <a href="product_details.php?id=3" class="btn btn-primary w-100">View Details</a>
-            </div>
-          </div>
-        </div>
-      </div>
+        <?php endforeach; ?>
+      <?php endif; ?>
     </div>
   </div>
 </section>
@@ -92,46 +109,18 @@
   <div class="container">
     <h2 class="text-center mb-4">Shop by Category</h2>
     <div class="row text-center">
-      <div class="col-md-3 mb-3">
-        <a href="#" class="text-decoration-none">
-          <div class="card border-0">
-            <img src="assets/images/cat_electronics.jpg" class="card-img-top" alt="Electronics" style="height: 150px; object-fit: cover;">
-            <div class="card-body">
-              <h5 class="card-title">Electronics</h5>
+      <?php foreach ($allCategories as $cat): ?>
+        <div class="col-md-3 mb-3">
+          <a href="index.php?category=<?= $cat['category_id'] ?>" class="text-decoration-none">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-body">
+                <i class="fas fa-tag fa-3x mb-3 text-primary"></i>
+                <h5 class="card-title text-dark"><?= htmlspecialchars($cat['category_name']) ?></h5>
+              </div>
             </div>
-          </div>
-        </a>
-      </div>
-      <div class="col-md-3 mb-3">
-        <a href="#" class="text-decoration-none">
-          <div class="card border-0">
-            <img src="assets/images/cat_fashion.jpg" class="card-img-top" alt="Fashion" style="height: 150px; object-fit: cover;">
-            <div class="card-body">
-              <h5 class="card-title">Fashion</h5>
-            </div>
-          </div>
-        </a>
-      </div>
-      <div class="col-md-3 mb-3">
-        <a href="#" class="text-decoration-none">
-          <div class="card border-0">
-            <img src="assets/images/cat_home.jpg" class="card-img-top" alt="Home & Garden" style="height: 150px; object-fit: cover;">
-            <div class="card-body">
-              <h5 class="card-title">Home & Garden</h5>
-            </div>
-          </div>
-        </a>
-      </div>
-      <div class="col-md-3 mb-3">
-        <a href="#" class="text-decoration-none">
-          <div class="card border-0">
-            <img src="assets/images/cat_books.jpg" class="card-img-top" alt="Books" style="height: 150px; object-fit: cover;">
-            <div class="card-body">
-              <h5 class="card-title">Books</h5>
-            </div>
-          </div>
-        </a>
-      </div>
+          </a>
+        </div>
+      <?php endforeach; ?>
     </div>
   </div>
 </section>

@@ -1,21 +1,31 @@
 <?php
+require_once __DIR__ . '/auth.php';
+require_once __DIR__ . '/../Classes/Cart.php';
+require_once __DIR__ . '/../Classes/category.php';
 
-$isLoggedIn = isset($_SESSION['user_id']);
-$isAdmin = ($isLoggedIn && $_SESSION['role'] === 'admin');
+$cart = new Cart();
+$categoryObj = new Category();
+$categories = $categoryObj->getAll();
+
+$isLoggedIn = isLoggedIn();
+$isAdmin = isAdmin();
+$currentUser = getCurrentUser();
 ?>
 <!DOCTYPE html>
 <html lang="en" class="h-100">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>E-Commerce Store</title>
     <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css  " rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Optional: Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css  " />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../Assets/css/style.css">
 </head>
+
 <body class="d-flex flex-column h-100">
     <!-- Top Navigation Bar (Amazon Style) -->
     <nav class="navbar navbar-expand-lg bg-dark text-light py-4">
@@ -23,25 +33,24 @@ $isAdmin = ($isLoggedIn && $_SESSION['role'] === 'admin');
 
             <!-- Logo and "Deliver to" Section (Left Side) -->
             <div class="d-flex align-items-center me-3">
-                <a class="navbar-brand fw-bold d-flex align-items-center" href="../public/index.php">
-                    <i class="fas fa-store me-2"></i> ShopNow
+                <a class="navbar-brand fw-bold d-flex align-items-center text-white" href="../public/index.php">
+                    <i class="fas fa-store me-2 text-primary"></i> ShopNow
                 </a>
-                <!-- You can add "Deliver to" functionality here if needed later -->
-                <!-- <span class="ms-3 text-white small">Deliver to</span> -->
             </div>
 
             <!-- Search Bar (Center) -->
             <div class="d-none d-lg-block flex-grow-1 mx-3">
-                <form class="d-flex">
+                <form class="d-flex" action="../public/index.php" method="GET">
                     <div class="input-group">
-                        <select class="form-select" id="categorySelect" style="max-width: 70px;">
+                        <select class="form-select" name="category" id="categorySelect" style="max-width: 150px;">
                             <option value="all">All</option>
-                            <!-- Add more categories as needed -->
-                            <option value="electronics">Electronics</option>
-                            <option value="fashion">Fashion</option>
-                            <option value="home">Home</option>
+                            <?php foreach ($categories as $cat): ?>
+                                <option value="<?= $cat['category_id'] ?>"><?= htmlspecialchars($cat['category_name']) ?>
+                                </option>
+                            <?php endforeach; ?>
                         </select>
-                        <input type="text" class="form-control" placeholder="Search ShopNow" aria-label="Search">
+                        <input type="text" name="search" class="form-control" placeholder="Search ShopNow"
+                            aria-label="Search">
                         <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i></button>
                     </div>
                 </form>
@@ -53,8 +62,9 @@ $isAdmin = ($isLoggedIn && $_SESSION['role'] === 'admin');
                 <!-- Account & Lists / Hello, Sign in -->
                 <li class="nav-item dropdown me-3">
                     <?php if ($isLoggedIn): ?>
-                        <a class="nav-link dropdown-toggle text-white" href="#" id="accountDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Hello, <?= htmlspecialchars($_SESSION['first_name']) ?><br><small>Account & Lists</small>
+                        <a class="nav-link dropdown-toggle text-white" href="#" id="accountDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Hello, <?= htmlspecialchars($currentUser['first_name']) ?><br><small>Account & Lists</small>
                         </a>
                     <?php else: ?>
                         <a class="nav-link text-white" href="../public/login.php">
@@ -65,7 +75,9 @@ $isAdmin = ($isLoggedIn && $_SESSION['role'] === 'admin');
                         <?php if ($isLoggedIn): ?>
                             <li><a class="dropdown-item" href="../public/profile.php">Your Profile</a></li>
                             <li><a class="dropdown-item" href="../public/cart.php">Your Cart</a></li>
-                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
                             <li><a class="dropdown-item text-danger" href="../public/logout.php">Logout</a></li>
                             <?php if ($isAdmin): ?>
                                 <li><a class="dropdown-item" href="../admin/dashboard.php">Admin Dashboard</a></li>
@@ -77,22 +89,15 @@ $isAdmin = ($isLoggedIn && $_SESSION['role'] === 'admin');
                     </ul>
                 </li>
 
-                <!-- Cart (Updated Link Structure) -->
+                <!-- Cart -->
                 <li class="nav-item">
-                    <!-- Wrap entire cart content in the anchor tag -->
                     <a class="nav-link text-white d-flex flex-column align-items-center" href="../public/cart.php">
                         <div class="position-relative">
                             <i class="fas fa-shopping-cart fa-lg"></i>
-                            <!-- Calculate cart item count dynamically -->
-                            <?php
-                            $cartItemCount = 0;
-                            if (isset($_SESSION['cart']) && is_array($_SESSION['cart'])) {
-                                // Example: Count distinct product IDs (or sum quantities if your cart stores them)
-                                $cartItemCount = count($_SESSION['cart']);
-                            }
-                            ?>
-                            <?php if ($cartItemCount > 0): ?>
-                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark"><?= $cartItemCount ?></span>
+                            <?php $cartCount = $cart->getCount(); ?>
+                            <?php if ($cartCount > 0): ?>
+                                <span
+                                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark"><?= $cartCount ?></span>
                             <?php endif; ?>
                         </div>
                         <small>Cart</small>
@@ -104,7 +109,15 @@ $isAdmin = ($isLoggedIn && $_SESSION['role'] === 'admin');
         </div>
     </nav>
 
-
+    <!-- Navigation Bar Mobile Search -->
+    <div class="d-lg-none bg-dark p-2">
+        <form class="d-flex" action="../public/index.php" method="GET">
+            <div class="input-group">
+                <input type="text" name="search" class="form-control" placeholder="Search ShopNow" aria-label="Search">
+                <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i></button>
+            </div>
+        </form>
+    </div>
 
     <!-- Main content wrapper -->
     <main class="flex-shrink-0 flex-grow-1">

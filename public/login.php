@@ -1,46 +1,37 @@
 <?php
-include '../classes/database.php';
+require_once '../Classes/user.php';
+require_once '../includes/auth.php';
 
-//data base connection 
-$database = Database::getInstance() ;
-$connection = $database->getConnection();
-
-session_start();
-
-if (isset($_SESSION['user_id'])) {
+if (isLoggedIn()) {
     header('Location: index.php');
     exit;
 }
 
 $error_message = "";
 
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = trim($_POST['email']);
+    $password = $_POST['password'];
 
-$email = trim($_POST['email']);
-$password = $_POST['password'];
-
-
-if (empty($email) || empty($password)) {
+    if (empty($email) || empty($password)) {
         $error_message = "Please fill all fields!";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error_message = "Invalid email format!";
     } else {
-     
-// fetch the user from the db
-    $stmt = $connection->prepare("SELECT * FROM users WHERE email = ?");
-    $stmt->execute([$email]);
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);//one row
+        $userObj = new User();
+        $user = $userObj->login($email, $password);
 
-    if ($user && password_verify($password, $user['password'])) {
-
-        $_SESSION['user_id'] = $user['user_id'];
-        $_SESSION['first_name'] = $user['first_name'];
-        $_SESSION['role'] = $user['role'];
-
-        header('Location: index.php');
-        exit;
-
+        if ($user) {
+            login(
+                $user['user_id'],
+                $user['first_name'],
+                $user['last_name'],
+                $user['email'],
+                $user['location'],
+                $user['role']
+            );
+            header('Location: index.php');
+            exit;
         } else {
             $error_message = "Email or password is incorrect!";
         }
@@ -69,21 +60,13 @@ include '../includes/header.php';
                     <form method="POST">
                         <div class="mb-3">
                             <label for="email" class="form-label">Email Address</label>
-                            <input type="email"
-                                   class="form-control"
-                                   id="email"
-                                   name="email"
-                                   value="<?= htmlspecialchars($email ?? '') ?>"
-                                   required>
+                            <input type="email" class="form-control" id="email" name="email"
+                                value="<?= htmlspecialchars($email ?? '') ?>" required>
                         </div>
 
                         <div class="mb-3">
                             <label for="password" class="form-label">Password</label>
-                            <input type="password"
-                                   class="form-control"
-                                   id="password"
-                                   name="password"
-                                   required>
+                            <input type="password" class="form-control" id="password" name="password" required>
                         </div>
 
                         <div class="d-grid">
